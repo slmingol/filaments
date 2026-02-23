@@ -1,0 +1,52 @@
+version: '3.8'
+
+services:
+  # Game server
+  filaments-server:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: filaments-server
+    ports:
+      - "8802:8802"
+    volumes:
+      # Persist board cache
+      - ./boards.json:/app/boards.json
+    restart: unless-stopped
+    networks:
+      - filaments-net
+
+  # Nginx web server for static files
+  nginx:
+    image: nginx:alpine
+    container_name: filaments-nginx
+    ports:
+      - "8081:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
+      - nginx-static:/usr/share/nginx/html:ro
+    depends_on:
+      - filaments-server
+    restart: unless-stopped
+    networks:
+      - filaments-net
+
+  # Init container to copy static files
+  static-init:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: frontend
+    container_name: filaments-static-init
+    volumes:
+      - nginx-static:/static
+    command: sh -c "cp -r /build/out/* /static/"
+    networks:
+      - filaments-net
+
+volumes:
+  nginx-static:
+
+networks:
+  filaments-net:
+    driver: bridge
