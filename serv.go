@@ -16,6 +16,8 @@ import (
 	"github.com/lithammer/shortuuid/v4"
 )
 
+const VERSION = "1.0.0"
+
 const (
 	// No longer used (probably since 2024-08-24)
 	// STRAND_URI = "https://www.nytimes.com/games-assets/strands/%s.json"
@@ -747,6 +749,9 @@ func NewServer(address string, port int, userLifetime time.Duration) *GameServer
 func (g *GameServer) Serve() {
 	http.Handle("/", g)
 	fullAddress := fmt.Sprintf("%s:%d", g.addr, g.port)
+	log.Println("========================================")
+	log.Printf("   filaments v%s", VERSION)
+	log.Println("========================================")
 	log.Printf("Starting server @ \"%s\"\n", fullAddress)
 	log.Fatal(http.ListenAndServe(fullAddress, nil))
 }
