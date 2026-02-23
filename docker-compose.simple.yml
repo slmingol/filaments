@@ -1,0 +1,47 @@
+version: '3.8'
+
+services:
+  # Game server from GHCR
+  filaments-server:
+    image: ghcr.io/slmingol/filaments:latest
+    container_name: filaments-server
+    ports:
+      - "8802:8802"
+    volumes:
+      # Persist board cache
+      - ./boards.json:/app/boards.json
+    restart: unless-stopped
+    networks:
+      - filaments-net
+
+  # Nginx web server for static files
+  nginx:
+    image: nginx:alpine
+    container_name: filaments-nginx
+    ports:
+      - "8080:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
+      - nginx-static:/usr/share/nginx/html:ro
+    depends_on:
+      - filaments-server
+    restart: unless-stopped
+    networks:
+      - filaments-net
+
+  # Init container to copy static files from GHCR image
+  static-init:
+    image: ghcr.io/slmingol/filaments:latest
+    container_name: filaments-static-init
+    volumes:
+      - nginx-static:/static
+    command: sh -c "cp -r /app/static/* /static/"
+    networks:
+      - filaments-net
+
+volumes:
+  nginx-static:
+
+networks:
+  filaments-net:
+    driver: bridge
