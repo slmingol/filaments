@@ -7,11 +7,11 @@ WORKDIR /build
 RUN apk add --no-cache perl bash
 
 # Copy package files and install dependencies
-COPY package*.json ./
+COPY ../package*.json ./
 RUN npm ci
 
 # Copy source files
-COPY . .
+COPY ../ .
 
 # Build frontend assets
 ENV WS_ADDRESS=ws://localhost:8802
@@ -33,10 +33,10 @@ FROM golang:1.23-alpine AS backend
 
 WORKDIR /build
 
-COPY go.mod go.sum ./
+COPY ../go.mod ../go.sum ./
 RUN go mod download
 
-COPY serv.go ./
+COPY ../serv.go ./
 RUN CGO_ENABLED=0 GOOS=linux go build -o serv serv.go
 
 # Final runtime image
