@@ -66,9 +66,9 @@ go test ./...                # Run tests
 
 ### Docker
 ```bash
-docker compose build
-docker compose up
-docker compose -f docker-compose.simple.yml up
+podman compose build
+podman compose up
+podman compose -f docker-compose.simple.yml up
 ```
 
 ### Environment Variable
