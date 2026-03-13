@@ -8,3 +8,5 @@ ts/board-old.ts
 boards.json
 notes
 boards/
+
+.vscode/
